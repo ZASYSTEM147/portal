@@ -1,4 +1,4 @@
-const CACHE_NAME = "zasystem147-portal-v4";
+const CACHE_NAME = "zasystem147-portal-v6";
 const APP_SHELL = [
   "./",
   "./index.html",
