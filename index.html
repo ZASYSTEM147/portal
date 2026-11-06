@@ -90,17 +90,57 @@
     margin: 0;
   }
 
-  .clock-card { text-align: center; margin-bottom: 18px; }
+  /* ---------- clock ---------- */
+  .clock-card { text-align: center; margin-bottom: 18px; position: relative; overflow: hidden; }
+  .clock-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 0%, rgba(66,165,245,0.18), transparent 60%);
+    pointer-events: none;
+  }
+  .clock-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+    padding: 6px 12px;
+    border-radius: 16px;
+    transition: transform 0.15s, background 0.2s;
+  }
+  .clock-wrap:hover { background: rgba(21,101,192,0.06); }
+  .clock-wrap:active { transform: scale(0.97); }
   .clock {
-    font-size: clamp(2.6rem, 14vw, 5rem);
+    font-size: clamp(2.6rem, 13vw, 5.2rem);
     font-weight: 700;
     font-variant-numeric: tabular-nums;
     color: var(--primary);
     letter-spacing: 1px;
     line-height: 1.1;
+    display: flex;
+    align-items: center;
   }
-  .date-line { font-size: 1rem; margin-top: 8px; }
-  .hijri-line { font-size: 0.98rem; color: var(--muted); margin-top: 4px; }
+  .clock .colon { animation: blink 1s steps(1, end) infinite; margin: 0 2px; }
+  .clock .sec { display: inline-block; min-width: 1.3ch; }
+  .clock .sec.tick { animation: tick 0.25s ease-out; }
+  @keyframes blink { 50% { opacity: 0.2; } }
+  @keyframes tick { from { transform: translateY(-6px); opacity: 0.4; } to { transform: none; opacity: 1; } }
+  .ampm {
+    font-size: clamp(0.9rem, 3vw, 1.3rem);
+    font-weight: 700;
+    background: var(--primary);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 8px;
+    margin-top: 8px;
+    letter-spacing: 1px;
+  }
+  .ampm[hidden] { display: none; }
+  .mode-hint { font-size: 0.78rem; color: var(--muted); margin-top: 6px; }
+  .date-line { font-size: 1rem; margin-top: 8px; position: relative; }
+  .hijri-line { font-size: 0.98rem; color: var(--muted); margin-top: 4px; position: relative; }
 
   .adjust {
     display: inline-flex;
@@ -109,6 +149,7 @@
     margin-top: 12px;
     font-size: 0.85rem;
     color: var(--muted);
+    position: relative;
   }
   .adj-btn {
     background: var(--primary);
@@ -150,10 +191,13 @@
     border-radius: 8px;
     padding: 9px 0;
     font-size: 0.95rem;
+    transition: transform 0.15s, background 0.15s;
   }
+  .cal .cell:not(.empty):hover { transform: scale(1.08); background: var(--border); }
   .cal .cell.empty { background: transparent; }
   .cal .cell.today { background: var(--today); color: #fff; font-weight: 700; }
 
+  /* ---------- system buttons ---------- */
   .links-title { margin: 0 0 12px; }
   .links {
     display: grid;
@@ -161,20 +205,112 @@
     gap: 14px;
   }
   .link-btn {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 14px;
     background: linear-gradient(135deg, var(--primary), var(--primary-dark));
     color: #fff;
     text-decoration: none;
-    padding: 20px 18px;
-    min-height: 76px;
+    padding: 18px;
+    min-height: 84px;
     border-radius: 14px;
     box-shadow: 0 6px 18px rgba(13, 71, 161, 0.25);
+    transition: transform 0.15s, box-shadow 0.15s;
   }
+  .link-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(13, 71, 161, 0.35); }
   .link-btn:active { transform: scale(0.98); }
-  .link-btn .lt { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
-  .link-btn .ld { font-size: 0.86rem; opacity: 0.88; }
+  .link-icon {
+    flex: 0 0 52px;
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .link-icon svg { width: 28px; height: 28px; }
+  .link-text .lt { font-size: 1.08rem; font-weight: 700; margin-bottom: 3px; }
+  .link-text .ld { font-size: 0.85rem; opacity: 0.88; }
 
   footer { text-align: center; color: var(--muted); font-size: 0.82rem; margin-top: 28px; }
+
+  /* ---------- phone: fit everything on one screen ---------- */
+  @media (max-width: 600px) {
+    body {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      height: 100dvh;
+    }
+    header {
+      padding: calc(8px + env(safe-area-inset-top, 0px)) 12px 8px;
+      flex-wrap: nowrap;
+      gap: 6px;
+    }
+    header h1 { font-size: 0.95rem; }
+    header p { display: none; }
+    .controls { gap: 6px; }
+    .ctrl-btn { padding: 6px 9px; min-height: 34px; font-size: 0.72rem; border-radius: 8px; }
+
+    .container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-width: none;
+      width: 100%;
+      padding: 8px 10px calc(8px + env(safe-area-inset-bottom, 0px));
+      min-height: 0;
+    }
+    .card { padding: 8px 10px; border-radius: 12px; }
+
+    .clock-card { margin-bottom: 0; padding: 6px 10px; }
+    .clock-wrap { padding: 0 6px; gap: 6px; }
+    .clock { font-size: 12vw; letter-spacing: 0; }
+    .ampm { font-size: 0.7rem; margin-top: 4px; padding: 2px 6px; }
+    .mode-hint { display: none; }
+    .date-line { font-size: 0.82rem; margin-top: 0; }
+    .hijri-line { font-size: 0.78rem; margin-top: 0; }
+    .adjust { margin-top: 4px; font-size: 0.7rem; gap: 6px; }
+    .adj-btn { width: 30px; height: 30px; font-size: 1rem; border-radius: 8px; }
+    .adj-val { min-width: 26px; font-size: 0.85rem; }
+
+    .cal-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 0;
+    }
+    .cal-head { margin-bottom: 4px; gap: 2px; }
+    .cal-head .section-title { font-size: 0.72rem; }
+    .cal-month { font-size: 0.62rem; }
+    .cal { gap: 2px; }
+    .cal .wd { font-size: 0.55rem; padding: 1px 0; }
+    .cal .cell { font-size: 0.66rem; padding: 3px 0; border-radius: 5px; }
+    .cal .cell:not(.empty):hover { transform: none; }
+
+    .links-title { display: none; }
+    .links {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .link-btn {
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+      gap: 4px;
+      padding: 8px 4px;
+      min-height: 0;
+      border-radius: 12px;
+    }
+    .link-btn:hover { transform: none; }
+    .link-icon { flex: 0 0 auto; width: 34px; height: 34px; border-radius: 10px; }
+    .link-icon svg { width: 20px; height: 20px; }
+    .link-text .lt { font-size: 0.7rem; line-height: 1.2; margin-bottom: 0; }
+    .link-text .ld { display: none; }
+
+    footer { display: none; }
+  }
 </style>
 </head>
 <body>
@@ -194,7 +330,11 @@
 <main class="container">
 
   <section class="card clock-card">
-    <div class="clock" id="clock">--:--:--</div>
+    <div class="clock-wrap" id="clockWrap" role="button" tabindex="0">
+      <div class="clock" id="clock">--:--:--</div>
+      <span class="ampm" id="ampm" hidden></span>
+    </div>
+    <div class="mode-hint" id="modeHint"></div>
     <div class="date-line" id="gDate"></div>
     <div class="hijri-line" id="hDate"></div>
     <div class="adjust">
@@ -227,16 +367,31 @@
     <h2 class="section-title links-title" data-i18n="linksTitle"></h2>
     <div class="links">
       <a class="link-btn" href="https://zasystem147.github.io/jawatan-kosong/" target="_blank" rel="noopener">
-        <div class="lt" data-i18n="btn1Title"></div>
-        <div class="ld" data-i18n="btn1Desc"></div>
+        <span class="link-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/></svg>
+        </span>
+        <span class="link-text">
+          <div class="lt" data-i18n="btn1Title"></div>
+          <div class="ld" data-i18n="btn1Desc"></div>
+        </span>
       </a>
       <a class="link-btn" href="https://zasystem147.github.io/holiday/" target="_blank" rel="noopener">
-        <div class="lt" data-i18n="btn2Title"></div>
-        <div class="ld" data-i18n="btn2Desc"></div>
+        <span class="link-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>
+        </span>
+        <span class="link-text">
+          <div class="lt" data-i18n="btn2Title"></div>
+          <div class="ld" data-i18n="btn2Desc"></div>
+        </span>
       </a>
       <a class="link-btn" href="https://zasystem147.github.io/struktur-organisasi/" target="_blank" rel="noopener">
-        <div class="lt" data-i18n="btn3Title"></div>
-        <div class="ld" data-i18n="btn3Desc"></div>
+        <span class="link-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="16" y="16" width="6" height="6" rx="1"/><path d="M12 8v4M5 16v-4h14v4"/></svg>
+        </span>
+        <span class="link-text">
+          <div class="lt" data-i18n="btn3Title"></div>
+          <div class="ld" data-i18n="btn3Desc"></div>
+        </span>
       </a>
     </div>
   </section>
@@ -262,6 +417,8 @@ const I18N = {
     langBtn: "BM",
     darkOn: "Dark Mode",
     darkOff: "Light Mode",
+    hint12: "Tap clock for 24-hour",
+    hint24: "Tap clock for 12-hour",
     weekdays: ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],
     gMonths: ["January","February","March","April","May","June","July","August","September","October","November","December"],
     hMonths: ["Muharram","Safar","Rabi al-Awwal","Rabi al-Thani","Jumada al-Awwal","Jumada al-Thani","Rajab","Sha'ban","Ramadan","Shawwal","Dhu al-Qa'dah","Dhu al-Hijjah"],
@@ -283,6 +440,8 @@ const I18N = {
     langBtn: "EN",
     darkOn: "Mod Gelap",
     darkOff: "Mod Cerah",
+    hint12: "Tekan jam untuk 24 jam",
+    hint24: "Tekan jam untuk 12 jam",
     weekdays: ["Ahd","Isn","Sel","Rab","Kha","Jum","Sab"],
     gMonths: ["Januari","Februari","Mac","April","Mei","Jun","Julai","Ogos","September","Oktober","November","Disember"],
     hMonths: ["Muharam","Safar","Rabiulawal","Rabiulakhir","Jamadilawal","Jamadilakhir","Rejab","Syaaban","Ramadan","Syawal","Zulkaedah","Zulhijjah"],
@@ -292,7 +451,9 @@ const I18N = {
 
 let lang = "en";
 let dark = false;
+let hour12 = true;
 let lastDayKey = "";
+let lastSec = -1;
 let hOffset = 0;
 let deferredPrompt = null;
 
@@ -318,7 +479,6 @@ function hParts(d) {
   return o;
 }
 
-// Hijri date for a Gregorian day, shifted by the user's adjustment
 function hijriOf(d) {
   return hParts(new Date(d.getFullYear(), d.getMonth(), d.getDate() + hOffset, 12));
 }
@@ -386,10 +546,33 @@ function updateDates() {
 }
 
 // ---------- clock ----------
+function renderClock(now) {
+  let h = now.getHours();
+  const m = pad(now.getMinutes());
+  const s = now.getSeconds();
+  let suffix = "";
+  if (hour12) {
+    suffix = h < 12 ? "AM" : "PM";
+    h = h % 12;
+    if (h === 0) h = 12;
+  }
+  const hh = hour12 ? String(h) : pad(h);
+
+  const secChanged = s !== lastSec;
+  lastSec = s;
+  const secHtml = '<span class="sec' + (secChanged ? " tick" : "") + '">' + pad(s) + "</span>";
+
+  document.getElementById("clock").innerHTML =
+    hh + '<span class="colon">:</span>' + m + '<span class="colon">:</span>' + secHtml;
+
+  const ampm = document.getElementById("ampm");
+  ampm.hidden = !hour12;
+  ampm.textContent = suffix;
+}
+
 function updateClock() {
   const now = new Date();
-  document.getElementById("clock").textContent =
-    pad(now.getHours()) + ":" + pad(now.getMinutes()) + ":" + pad(now.getSeconds());
+  renderClock(now);
 
   const dayKey = now.getFullYear() + "-" + now.getMonth() + "-" + now.getDate();
   if (dayKey !== lastDayKey) {
@@ -398,6 +581,24 @@ function updateClock() {
     renderCalendars();
   }
 }
+
+function toggleClockMode() {
+  hour12 = !hour12;
+  saveSetting("zs147-hour12", hour12 ? "1" : "0");
+  applyHintLabel();
+  lastSec = -1;
+  updateClock();
+}
+
+function applyHintLabel() {
+  document.getElementById("modeHint").textContent = hour12 ? t("hint12") : t("hint24");
+}
+
+const clockWrap = document.getElementById("clockWrap");
+clockWrap.addEventListener("click", toggleClockMode);
+clockWrap.addEventListener("keydown", e => {
+  if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleClockMode(); }
+});
 
 // ---------- Hijri adjustment ----------
 function setHijriOffset(v) {
@@ -420,6 +621,7 @@ function applyLanguage() {
   document.getElementById("langBtn").textContent = t("langBtn");
   document.getElementById("installBtn").textContent = t("installBtn");
   applyDarkLabel();
+  applyHintLabel();
   updateDates();
   renderCalendars();
 }
@@ -443,7 +645,7 @@ document.getElementById("darkBtn").addEventListener("click", () => {
   applyDarkLabel();
 });
 
-// ---------- install (Chrome / Edge on Android and desktop) ----------
+// ---------- install (Chrome / Edge) ----------
 window.addEventListener("beforeinstallprompt", e => {
   e.preventDefault();
   deferredPrompt = e;
@@ -473,6 +675,7 @@ if ("serviceWorker" in navigator) {
 lang = loadSetting("zs147-lang", "en") === "ms" ? "ms" : "en";
 dark = loadSetting("zs147-dark", "0") === "1";
 document.body.classList.toggle("dark", dark);
+hour12 = loadSetting("zs147-hour12", "1") !== "0";
 hOffset = parseInt(loadSetting("zs147-hijri-offset", "0"), 10) || 0;
 document.getElementById("hVal").textContent = (hOffset > 0 ? "+" : "") + hOffset;
 
