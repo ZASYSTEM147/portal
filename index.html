@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1565c0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="description" content="ZASYSTEM.147 Portal">
+<title>ZASYSTEM.147 Portal</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<style>
+  :root {
+    --bg: #eef5fc;
+    --card: #ffffff;
+    --text: #0b2545;
+    --muted: #5b7090;
+    --primary: #1565c0;
+    --primary-dark: #0d47a1;
+    --today: #1565c0;
+    --border: #d6e4f5;
+    --cell: #f4f8fd;
+  }
+  body.dark {
+    --bg: #0a1628;
+    --card: #112240;
+    --text: #e6f0ff;
+    --muted: #8fa6c8;
+    --primary: #42a5f5;
+    --primary-dark: #1e88e5;
+    --today: #1e88e5;
+    --border: #1f3a60;
+    --cell: #0d1d36;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    min-height: 100dvh;
+    transition: background 0.3s, color 0.3s;
+  }
+  header {
+    background: linear-gradient(135deg, #0d47a1, #1e88e5);
+    color: #fff;
+    padding: calc(14px + env(safe-area-inset-top, 0px)) 18px 14px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+  }
+  header h1 { margin: 0; font-size: 1.3rem; letter-spacing: 0.5px; }
+  header p { margin: 2px 0 0; opacity: 0.85; font-size: 0.88rem; }
+  .controls { display: flex; flex-wrap: wrap; gap: 8px; }
+  .ctrl-btn {
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.4);
+    padding: 10px 14px;
+    min-height: 44px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  .ctrl-btn:active { background: rgba(255,255,255,0.3); }
+  .install-btn { background: #fff; color: var(--primary-dark); border: none; }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 18px 14px calc(32px + env(safe-area-inset-bottom, 0px));
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow: 0 4px 16px rgba(13, 71, 161, 0.08);
+  }
+  .section-title {
+    font-size: 1.02rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 0;
+  }
+
+  .clock-card { text-align: center; margin-bottom: 18px; }
+  .clock {
+    font-size: clamp(2.6rem, 14vw, 5rem);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--primary);
+    letter-spacing: 1px;
+    line-height: 1.1;
+  }
+  .date-line { font-size: 1rem; margin-top: 8px; }
+  .hijri-line { font-size: 0.98rem; color: var(--muted); margin-top: 4px; }
+
+  .adjust {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .adj-btn {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .adj-val { min-width: 56px; text-align: center; font-weight: 700; color: var(--text); }
+
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+  .cal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .cal-month { font-weight: 600; color: var(--muted); font-size: 0.92rem; }
+  .cal {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    text-align: center;
+  }
+  .cal .wd { font-size: 0.72rem; font-weight: 700; color: var(--muted); padding: 6px 0; }
+  .cal .cell {
+    background: var(--cell);
+    border-radius: 8px;
+    padding: 9px 0;
+    font-size: 0.95rem;
+  }
+  .cal .cell.empty { background: transparent; }
+  .cal .cell.today { background: var(--today); color: #fff; font-weight: 700; }
+
+  .links-title { margin: 0 0 12px; }
+  .links {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+  }
+  .link-btn {
+    display: block;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: #fff;
+    text-decoration: none;
+    padding: 20px 18px;
+    min-height: 76px;
+    border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(13, 71, 161, 0.25);
+  }
+  .link-btn:active { transform: scale(0.98); }
+  .link-btn .lt { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
+  .link-btn .ld { font-size: 0.86rem; opacity: 0.88; }
+
+  footer { text-align: center; color: var(--muted); font-size: 0.82rem; margin-top: 28px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>ZASYSTEM.147 Portal</h1>
+    <p data-i18n="subtitle"></p>
+  </div>
+  <div class="controls">
+    <button class="ctrl-btn install-btn" id="installBtn" type="button" hidden></button>
+    <button class="ctrl-btn" id="langBtn" type="button"></button>
+    <button class="ctrl-btn" id="darkBtn" type="button"></button>
+  </div>
+</header>
+
+<main class="container">
+
+  <section class="card clock-card">
+    <div class="clock" id="clock">--:--:--</div>
+    <div class="date-line" id="gDate"></div>
+    <div class="hijri-line" id="hDate"></div>
+    <div class="adjust">
+      <span data-i18n="hijriAdjust"></span>
+      <button class="adj-btn" id="hMinus" type="button" aria-label="-1">−</button>
+      <span class="adj-val" id="hVal">0</span>
+      <button class="adj-btn" id="hPlus" type="button" aria-label="+1">+</button>
+    </div>
+  </section>
+
+  <section class="cal-grid">
+    <div class="card">
+      <div class="cal-head">
+        <h2 class="section-title" data-i18n="gregTitle"></h2>
+        <span class="cal-month" id="gMonthLabel"></span>
+      </div>
+      <div class="cal" id="gCal"></div>
+    </div>
+
+    <div class="card">
+      <div class="cal-head">
+        <h2 class="section-title" data-i18n="hijriTitle"></h2>
+        <span class="cal-month" id="hMonthLabel"></span>
+      </div>
+      <div class="cal" id="hCal"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title links-title" data-i18n="linksTitle"></h2>
+    <div class="links">
+      <a class="link-btn" href="https://zasystem147.github.io/jawatan-kosong/" target="_blank" rel="noopener">
+        <div class="lt" data-i18n="btn1Title"></div>
+        <div class="ld" data-i18n="btn1Desc"></div>
+      </a>
+      <a class="link-btn" href="https://zasystem147.github.io/holiday/" target="_blank" rel="noopener">
+        <div class="lt" data-i18n="btn2Title"></div>
+        <div class="ld" data-i18n="btn2Desc"></div>
+      </a>
+      <a class="link-btn" href="https://zasystem147.github.io/struktur-organisasi/" target="_blank" rel="noopener">
+        <div class="lt" data-i18n="btn3Title"></div>
+        <div class="ld" data-i18n="btn3Desc"></div>
+      </a>
+    </div>
+  </section>
+
+  <footer>ZASYSTEM.147 Portal</footer>
+</main>
+
+<script>
+const I18N = {
+  en: {
+    subtitle: "Quick access to your systems",
+    hijriAdjust: "Hijri adjust (days)",
+    gregTitle: "Gregorian Calendar",
+    hijriTitle: "Hijri Calendar",
+    linksTitle: "Systems",
+    btn1Title: "Vacancy Process",
+    btn1Desc: "Jawatan kosong tracker",
+    btn2Title: "Holiday",
+    btn2Desc: "Public holiday list",
+    btn3Title: "Organisation Structure",
+    btn3Desc: "Struktur organisasi",
+    installBtn: "Install App",
+    langBtn: "BM",
+    darkOn: "Dark Mode",
+    darkOff: "Light Mode",
+    weekdays: ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],
+    gMonths: ["January","February","March","April","May","June","July","August","September","October","November","December"],
+    hMonths: ["Muharram","Safar","Rabi al-Awwal","Rabi al-Thani","Jumada al-Awwal","Jumada al-Thani","Rajab","Sha'ban","Ramadan","Shawwal","Dhu al-Qa'dah","Dhu al-Hijjah"],
+    hSuffix: "AH"
+  },
+  ms: {
+    subtitle: "Akses pantas ke sistem anda",
+    hijriAdjust: "Laras Hijrah (hari)",
+    gregTitle: "Kalendar Masihi",
+    hijriTitle: "Kalendar Hijrah",
+    linksTitle: "Sistem",
+    btn1Title: "Proses Jawatan Kosong",
+    btn1Desc: "Penjejak jawatan kosong",
+    btn2Title: "Cuti Umum",
+    btn2Desc: "Senarai cuti umum",
+    btn3Title: "Struktur Organisasi",
+    btn3Desc: "Carta struktur organisasi",
+    installBtn: "Pasang Aplikasi",
+    langBtn: "EN",
+    darkOn: "Mod Gelap",
+    darkOff: "Mod Cerah",
+    weekdays: ["Ahd","Isn","Sel","Rab","Kha","Jum","Sab"],
+    gMonths: ["Januari","Februari","Mac","April","Mei","Jun","Julai","Ogos","September","Oktober","November","Disember"],
+    hMonths: ["Muharam","Safar","Rabiulawal","Rabiulakhir","Jamadilawal","Jamadilakhir","Rejab","Syaaban","Ramadan","Syawal","Zulkaedah","Zulhijjah"],
+    hSuffix: "H"
+  }
+};
+
+let lang = "en";
+let dark = false;
+let lastDayKey = "";
+let hOffset = 0;
+let deferredPrompt = null;
+
+// ---------- storage (wrapped, in case the browser blocks it) ----------
+function loadSetting(key, fallback) {
+  try { const v = localStorage.getItem(key); return v === null ? fallback : v; }
+  catch (e) { return fallback; }
+}
+function saveSetting(key, value) {
+  try { localStorage.setItem(key, value); } catch (e) {}
+}
+
+// ---------- helpers ----------
+const hFmt = new Intl.DateTimeFormat("en-US-u-ca-islamic-umalqura", {
+  day: "numeric", month: "numeric", year: "numeric"
+});
+
+function hParts(d) {
+  const o = {};
+  for (const p of hFmt.formatToParts(d)) {
+    if (p.type === "day" || p.type === "month" || p.type === "year") o[p.type] = parseInt(p.value, 10);
+  }
+  return o;
+}
+
+// Hijri date for a Gregorian day, shifted by the user's adjustment
+function hijriOf(d) {
+  return hParts(new Date(d.getFullYear(), d.getMonth(), d.getDate() + hOffset, 12));
+}
+
+function sameDay(a, b) {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+
+function pad(n) { return n < 10 ? "0" + n : "" + n; }
+function t(key) { return I18N[lang][key]; }
+
+// ---------- calendars ----------
+function gregorianMonthDates(now) {
+  const y = now.getFullYear(), m = now.getMonth();
+  const days = new Date(y, m + 1, 0).getDate();
+  const out = [];
+  for (let i = 1; i <= days; i++) out.push(new Date(y, m, i, 12));
+  return { dates: out, label: t("gMonths")[m] + " " + y };
+}
+
+function hijriMonthDates(now) {
+  let s = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 12);
+  let guard = 0;
+  while (hijriOf(s).day !== 1 && guard++ < 40) s.setDate(s.getDate() - 1);
+  const info = hijriOf(s);
+  const out = [];
+  const c = new Date(s);
+  while (hijriOf(c).month === info.month && out.length < 31) {
+    out.push(new Date(c));
+    c.setDate(c.getDate() + 1);
+  }
+  return { dates: out, label: t("hMonths")[info.month - 1] + " " + info.year + " " + t("hSuffix") };
+}
+
+function renderCalendar(container, dates, labelFn) {
+  const now = new Date();
+  let html = "";
+  t("weekdays").forEach(w => { html += '<div class="wd">' + w + "</div>"; });
+  const offset = dates[0].getDay();
+  for (let i = 0; i < offset; i++) html += '<div class="cell empty"></div>';
+  dates.forEach(d => {
+    html += '<div class="' + (sameDay(d, now) ? "cell today" : "cell") + '">' + labelFn(d) + "</div>";
+  });
+  container.innerHTML = html;
+}
+
+function renderCalendars() {
+  const now = new Date();
+  const g = gregorianMonthDates(now);
+  renderCalendar(document.getElementById("gCal"), g.dates, d => d.getDate());
+  document.getElementById("gMonthLabel").textContent = g.label;
+
+  const h = hijriMonthDates(now);
+  renderCalendar(document.getElementById("hCal"), h.dates, d => hijriOf(d).day);
+  document.getElementById("hMonthLabel").textContent = h.label;
+}
+
+function updateDates() {
+  const now = new Date();
+  document.getElementById("gDate").textContent =
+    now.getDate() + " " + t("gMonths")[now.getMonth()] + " " + now.getFullYear();
+  const hp = hijriOf(now);
+  document.getElementById("hDate").textContent =
+    hp.day + " " + t("hMonths")[hp.month - 1] + " " + hp.year + " " + t("hSuffix");
+}
+
+// ---------- clock ----------
+function updateClock() {
+  const now = new Date();
+  document.getElementById("clock").textContent =
+    pad(now.getHours()) + ":" + pad(now.getMinutes()) + ":" + pad(now.getSeconds());
+
+  const dayKey = now.getFullYear() + "-" + now.getMonth() + "-" + now.getDate();
+  if (dayKey !== lastDayKey) {
+    lastDayKey = dayKey;
+    updateDates();
+    renderCalendars();
+  }
+}
+
+// ---------- Hijri adjustment ----------
+function setHijriOffset(v) {
+  hOffset = Math.max(-2, Math.min(2, v));
+  saveSetting("zs147-hijri-offset", String(hOffset));
+  document.getElementById("hVal").textContent = (hOffset > 0 ? "+" : "") + hOffset;
+  updateDates();
+  renderCalendars();
+}
+
+document.getElementById("hMinus").addEventListener("click", () => setHijriOffset(hOffset - 1));
+document.getElementById("hPlus").addEventListener("click", () => setHijriOffset(hOffset + 1));
+
+// ---------- language & theme ----------
+function applyLanguage() {
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    el.textContent = t(el.getAttribute("data-i18n"));
+  });
+  document.getElementById("langBtn").textContent = t("langBtn");
+  document.getElementById("installBtn").textContent = t("installBtn");
+  applyDarkLabel();
+  updateDates();
+  renderCalendars();
+}
+
+function applyDarkLabel() {
+  document.getElementById("darkBtn").textContent = dark ? t("darkOff") : t("darkOn");
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute("content", dark ? "#0a1628" : "#1565c0");
+}
+
+document.getElementById("langBtn").addEventListener("click", () => {
+  lang = lang === "en" ? "ms" : "en";
+  saveSetting("zs147-lang", lang);
+  applyLanguage();
+});
+
+document.getElementById("darkBtn").addEventListener("click", () => {
+  dark = !dark;
+  saveSetting("zs147-dark", dark ? "1" : "0");
+  document.body.classList.toggle("dark", dark);
+  applyDarkLabel();
+});
+
+// ---------- install (Chrome / Edge on Android and desktop) ----------
+window.addEventListener("beforeinstallprompt", e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById("installBtn").hidden = false;
+});
+
+document.getElementById("installBtn").addEventListener("click", async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  document.getElementById("installBtn").hidden = true;
+});
+
+window.addEventListener("appinstalled", () => {
+  deferredPrompt = null;
+  document.getElementById("installBtn").hidden = true;
+});
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+  });
+}
+
+// ---------- init ----------
+lang = loadSetting("zs147-lang", "en") === "ms" ? "ms" : "en";
+dark = loadSetting("zs147-dark", "0") === "1";
+document.body.classList.toggle("dark", dark);
+hOffset = parseInt(loadSetting("zs147-hijri-offset", "0"), 10) || 0;
+document.getElementById("hVal").textContent = (hOffset > 0 ? "+" : "") + hOffset;
+
+applyLanguage();
+updateClock();
+setInterval(updateClock, 1000);
+</script>
+</body>
+</html>

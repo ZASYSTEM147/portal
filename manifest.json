@@ -1,0 +1,25 @@
+{
+  "name": "ZASYSTEM.147 Portal",
+  "short_name": "ZASYSTEM.147",
+  "description": "ZASYSTEM.147 Portal with clock, Gregorian and Hijri calendars",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#eef5fc",
+  "theme_color": "#1565c0",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
