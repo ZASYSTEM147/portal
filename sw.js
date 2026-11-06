@@ -1,5 +1,13 @@
-const CACHE_NAME = "zasystem147-portal-v1";
-const APP_SHELL = ["./", "./index.html", "./manifest.json", "./icon.svg"];
+const CACHE_NAME = "zasystem147-portal-v2";
+const APP_SHELL = [
+  "./",
+  "./index.html",
+  "./manifest.json",
+  "./icon.svg",
+  "./icon-192.png",
+  "./icon-512.png",
+  "./icon-maskable-512.png"
+];
 
 self.addEventListener("install", event => {
   event.waitUntil(
@@ -15,7 +23,7 @@ self.addEventListener("activate", event => {
   );
 });
 
-// Network first for the portal page, fall back to cache when offline.
+// Network first, fall back to cache when offline.
 self.addEventListener("fetch", event => {
   const req = event.request;
   if (req.method !== "GET" || new URL(req.url).origin !== self.location.origin) return;
