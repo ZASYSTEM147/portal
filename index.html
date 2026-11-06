@@ -244,14 +244,30 @@
       height: 100dvh;
     }
     header {
-      padding: calc(8px + env(safe-area-inset-top, 0px)) 12px 8px;
+      flex-direction: column;
+      align-items: stretch;
+      text-align: center;
+      padding: calc(8px + env(safe-area-inset-top, 0px)) 10px 8px;
+      gap: 8px;
+    }
+    header h1 { font-size: 1rem; }
+    header p { display: none; }
+    .controls {
+      display: flex;
       flex-wrap: nowrap;
       gap: 6px;
+      width: 100%;
     }
-    header h1 { font-size: 0.95rem; }
-    header p { display: none; }
-    .controls { gap: 6px; }
-    .ctrl-btn { padding: 6px 9px; min-height: 34px; font-size: 0.72rem; border-radius: 8px; }
+    .ctrl-btn {
+      flex: 1 1 0;
+      min-width: 0;
+      padding: 6px 4px;
+      min-height: 34px;
+      font-size: 0.74rem;
+      border-radius: 8px;
+      white-space: nowrap;
+      text-align: center;
+    }
 
     .container {
       flex: 1;
